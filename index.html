@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KALAI MESS- Full App</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{background:#fff8f0;padding-bottom:80px}
+header{background:#d32f2f;color:white;padding:16px;text-align:center;position:sticky;top:0;z-index:10}
+header h1{font-size:22px}
+.page{display:none;padding:12px;animation:fade .3s}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.banner{border-radius:14px;overflow:hidden;position:relative;height:150px}
+.banner img{width:100%;height:100%;object-fit:cover}
+.banner div{position:absolute;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:white;width:100%;padding:12px}
+.search{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;margin:12px 0}
+.cats{display:flex;gap:8px;overflow-x:auto}
+.cats button{padding:10px 16px;border-radius:20px;border:1px solid #d32f2f;background:white;color:#d32f2f;white-space:nowrap}
+.cats button.active{background:#d32f2f;color:white}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card img{width:100%;height:110px;object-fit:cover}
+.card-body{padding:10px}.card-body h3{font-size:15px}.card-body p{font-size:12px;color:#777}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.price{font-weight:bold;color:#d32f2f}
+.add{background:#2e7d32;color:white;border:none;padding:6px 12px;border-radius:8px}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-top:10px}
+.btn{width:100%;background:#d32f2f;color:white;border:none;padding:14px;border-radius:12px;margin-top:12px;font-size:16px;font-weight:bold}
+.btn.green{background:#2e7d32}
+.item{display:flex;justify-content:space-between;background:white;padding:12px;border-radius:12px;margin-top:10px;align-items:center}
+.qty button{padding:2px 9px;margin:0 4px}
+.success{text-align:center;padding:30px 10px}
+.success .tick{font-size:70px}
+.profile-card{background:white;padding:20px;border-radius:16px;text-align:center}
+.avatar{font-size:60px}
+.admin-card{background:white;padding:14px;border-radius:12px;margin-top:10px;display:flex;justify-content:space-between}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid #eee;z-index:20}
+nav button{border:none;background:none;font-size:13px;color:#777}
+nav button.active{color:#d32f2f;font-weight:bold}
+.cart-bar{background:#222;color:white;padding:12px;border-radius:12px;display:flex;justify-content:space-between;margin-top:12px;align-items:center}
+</style>
+</head>
+<body>
+
+<header><h1>🍽️ KALAI MESS</h1><p>Kongu Taste • Coimbatore</p></header>
+
+<!-- SLIDE 1: HOME -->
+<div id="home" class="page active">
+  <div class="banner"><img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800"><div><h2>Today Offer 20% OFF</h2><p>On All Biryani - Use Code KALAI20</p></div></div>
+  <input class="search" placeholder="🔍 Biryani, Dosa, Meals search pannu..." oninput="searchFood(this.value)">
+  <div class="cats" id="homeCats"></div>
+  <h3 style="margin-top:14px">🔥 Popular Today</h3>
+  <div class="grid" id="homeGrid"></div>
+</div>
+
+<!-- SLIDE 2: MENU -->
+<div id="menuPage" class="page">
+  <h2>Full Menu</h2>
+  <div class="cats" id="menuCats"></div>
+  <div class="grid" id="menuGrid"></div>
+</div>
+
+<!-- SLIDE 3: CART -->
+<div id="cartPage" class="page">
+  <h2>🛒 Your Cart</h2>
+  <div id="cartItems"></div>
+  <h3 style="margin-top:12px">Total: ₹<span id="total">0</span></h3>
+  <input id="custName" placeholder="Your Name">
+  <input id="custAddr" placeholder="Delivery Address - Coimbatore">
+  <select><option>Cash on Delivery</option><option>UPI / GPay</option><option>Card</option></select>
+  <button class="btn green" onclick="placeOrder()">Place Order ✅</button>
+</div>
+
+<!-- SLIDE 4: ORDER SUCCESS -->
+<div id="successPage" class="page">
+  <div class="success">
+    <div class="tick">✅</div>
+    <h2>Order Confirmed!</h2>
+    <p style="margin:8px;color:#666">Order ID: #KALAI<span id="orderId">1024</span><br>30 mins la delivery varum da!</p>
+    <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=400" style="width:100%;border-radius:14px;margin:12px 0">
+    <p>🛵 Rider is on the way...</p>
+    <button class="btn" onclick="showPage('home')">Track Order / Home Poku</button>
+  </div>
+</div>
+
+<!-- SLIDE 5: LOGIN -->
+<div id="loginPage" class="page">
+  <h2>Welcome Back! 👋</h2>
+  <p style="color:#777">Login panni order pannu</p>
+  <input id="loginPhone" placeholder="Phone Number - 98765 43210">
+  <input type="password" placeholder="Password">
+  <button class="btn" onclick="doLogin()">Login</button>
+  <button class="btn green" onclick="alert('OTP sent to your phone!')">Login with OTP</button>
+  <p style="text-align:center;margin-top:10px;color:#d32f2f">New User? Sign Up</p>
+</div>
+
+<!-- SLIDE 6: PROFILE -->
+<div id="profilePage" class="page">
+  <div class="profile-card">
+    <div class="avatar">👨‍🍳</div>
+    <h2 id="profileName">Vanakkam, Guest!</h2>
+    <p>Coimbatore • 12 Orders • Gold Member ⭐</p>
+    <p style="margin-top:8px">📍 Gandhipuram, Coimbatore</p>
+  </div>
+  <div class="item"><span>📦 My Orders</span><span>></span></div>
+  <div class="item"><span>❤️ Favourites</span><span>></span></div>
+  <div class="item"><span>📍 Saved Addresses</span><span>></span></div>
+  <div class="item"><span>💳 Payment Methods</span><span>></span></div>
+  <div class="item"><span>⚙️ Settings</span><span>></span></div>
+  <button class="btn" onclick="showPage('loginPage')">Logout</button>
+</div>
+
+<!-- SLIDE 7: ADMIN -->
+<div id="adminPage" class="page">
+  <h2>👨‍💼 Admin Dashboard</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+    <div class="admin-card"><span>Today Orders</span><b>42</b></div>
+    <div class="admin-card"><span>Revenue</span><b>₹8,450</b></div>
+    <div class="admin-card"><span>Pending</span><b style="color:orange">5</b></div>
+    <div class="admin-card"><span>Delivered</span><b style="color:green">37</b></div>
+  </div>
+  <h3 style="margin-top:14px">Live Orders</h3>
+  <div id="adminOrders"></div>
+  <input id="newItemName" placeholder="New Item Name - Ex: Chicken 65">
+  <input id="newItemPrice" type="number" placeholder="Price">
+  <button class="btn green" onclick="addNewItem()">+ Add New Item to Menu</button>
+</div>
+
+<nav>
+  <button class="active" onclick="showPage('home',this)">🏠<br>Home</button>
+  <button onclick="showPage('menuPage',this)">🍽️<br>Menu</button>
+  <button onclick="showPage('cartPage',this)">🛒<br>Cart <span id="cartCount"></span></button>
+  <button onclick="showPage('loginPage',this)">👤<br>Login</button>
+  <button onclick="showPage('profilePage',this)">⭐<br>Profile</button>
+  <button onclick="showPage('adminPage',this)">⚙️<br>Admin</button>
+</nav>
+
+<script>
+let foods=[
+{id:1,name:"Full Meals",cat:"meals",price:120,desc:"Sambar, Rasam, Poriyal",img:"https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400"},
+{id:2,name:"Chicken Biryani",cat:"biryani",price:180,desc:"Seeraga Samba + Raita",img:"https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400"},
+{id:3,name:"Mutton Biryani",cat:"biryani",price:260,desc:"Kongu Style",img:"https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=400"},
+{id:4,name:"Idly (4 pcs)",cat:"tiffin",price:40,desc:"Soft Idly + Sambar",img:"https://images.unsplash.com/photo-1630383242702-3e117a1d2f1a?w=400"},
+{id:5,name:"Dosa",cat:"tiffin",price:50,desc:"Crispy Dosa + Masala",img:"https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=400"},
+{id:6,name:"Parotta",cat:"tiffin",price:60,desc:"Parotta + Salna",img:"https://images.unsplash.com/photo-1626074353765-517a681e40be?w=400"},
+{id:7,name:"Filter Coffee",cat:"drinks",price:25,desc:"Strong Coffee",img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400"},
+{id:8,name:"Lime Soda",cat:"drinks",price:40,desc:"Sweet / Salt",img:"https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=400"},
+];
+let cart={}, currentCat='all', search='';
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(id=='cartPage') renderCart();
+  if(id=='adminPage') renderAdmin();
+  window.scrollTo(0,0);
+}
+function cardHTML(f){ return `<div class="card"><img src="${f.img}"><div class="card-body"><h3>${f.name}</h3><p>${f.desc}</p><div class="row"><span class="price">₹${f.price}</span><button class="add" onclick="addToCart(${f.id})">+ ADD</button></div></div></div>`; }
+function renderAll(){
+  let cats=['all','meals','tiffin','biryani','drinks'];
+  let catBtns=cats.map(c=>`<button class="${currentCat==c?'active':''}" onclick="setCat('${c}')">${c=='all'?'All':c}</button>`).join('');
+  document.getElementById('homeCats').innerHTML=catBtns;
+  document.getElementById('menuCats').innerHTML=catBtns;
+  let filtered=foods.filter(f=>(currentCat=='all'||f.cat==currentCat) && f.name.toLowerCase().includes(search.toLowerCase()));
+  document.getElementById('homeGrid').innerHTML=filtered.map(cardHTML).join('');
+  document.getElementById('menuGrid').innerHTML=filtered.map(cardHTML).join('');
+}
+function setCat(c){ currentCat=c; renderAll(); }
+function searchFood(v){ search=v; renderAll(); }
+function addToCart(id){ cart[id]=(cart[id]||0)+1; updateCount(); alert('Added to Cart ✅'); }
+function updateCount(){ let c=Object.values(cart).reduce((a,b)=>a+b,0); document.getElementById('cartCount').innerText=c?`(${c})`:''; }
+function renderCart(){
+  let html=''; let total=0;
+  for(let id in cart){ let f=foods.find(x=>x.id==id); let q=cart[id]; total+=f.price*q;
+    html+=`<div class="item"><span>${f.name}<br>₹${f.price}</span><span><button onclick="changeQty(${id},-1)">-</button> ${q} <button onclick="changeQty(${id},1)">+</button> = ₹${f.price*q}</span></div>`;
+  }
+  document.getElementById('cartItems').innerHTML=html||'Cart empty da! Menu la poi add pannu.';
+  document.getElementById('total').innerText=total;
+}
+function changeQty(id,d){ cart[id]+=d; if(cart[id]<=0) delete cart[id]; updateCount(); renderCart(); }
+function placeOrder(){
+  if(Object.keys(cart).length==0) return alert('Cart empty da!');
+  document.getElementById('orderId').innerText=Math.floor(1000+Math.random()*9000);
+  cart={}; updateCount();
+  showPage('successPage');
+}
+function doLogin(){
+  let name=document.getElementById('loginPhone').value || 'Friend';
+  document.getElementById('profileName').innerText='Vanakkam, '+name+'!';
+  alert('Login Success! Welcome '+name);
+  showPage('profilePage');
+}
+function renderAdmin(){
+  document.getElementById('adminOrders').innerHTML=`
+  <div class="admin-card"><span>#1024 - Chicken Biryani x2</span><b style="color:orange">Preparing</b></div>
+  <div class="admin-card"><span>#1023 - Full Meals x1</span><b style="color:green">Delivered</b></div>
+  <div class="admin-card"><span>#1022 - Dosa x2 + Coffee</span><b style="color:blue">On the way</b></div>`;
+}
+function addNewItem(){
+  let n=document.getElementById('newItemName').value; let p=document.getElementById('newItemPrice').value;
+  if(!n||!p) return alert('Name + Price kudunga!');
+  foods.push({id:Date.now(),name:n,cat:'meals',price:parseInt(p),desc:'New Item',img:'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400'});
+  alert(n+' Menu la add aayiduchu!');
+  renderAll();
+}
+renderAll(); renderAdmin();
+</script>
+</body>
+</html>
